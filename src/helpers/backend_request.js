@@ -18,6 +18,10 @@ export const putChangePassword = async (data) => {
   return await put(url.CHANGE_PASSWORD, data);
 };
 
+export const getChangePassword = async (data) => {
+  return await get(url.CHANGE_PASSWORD, data);
+};
+
 export const putUpdateProfile = async (data) => {
   return await put(url.USER_PROFILE, data);
 };

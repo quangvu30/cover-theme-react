@@ -8,6 +8,7 @@ import {
   Input,
   Label,
   Form,
+  Spinner,
 } from "reactstrap";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -27,18 +28,20 @@ const Register = () => {
     name: "",
     birthday: "1999-01-01",
   });
-  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     // validate your userinfo
     e.preventDefault();
 
+    setLoading(true);
     console.log("post data");
     const response = await postRegister(userInfo);
     if (response.data?.success) {
-      alert("Register success !!!");
+      alert("Register success !!! Please check your email");
     } else {
       alert("Something wrong !!!");
     }
+    setLoading(false);
   };
 
   return (
@@ -163,7 +166,7 @@ const Register = () => {
                             className="btn btn-success w-100"
                             type="submit"
                           >
-                            Sign Up
+                            {loading ? <Spinner /> : "Sign Up"}
                           </button>
                         </div>
                       </Form>

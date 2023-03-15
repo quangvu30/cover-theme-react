@@ -117,7 +117,8 @@ export const resetPassword = async (email) => {
   u.token = token._id;
   await u.save();
 
-  const linkVerify = "http://localhost:3000/auth/changePassword" + token.token;
+  const linkVerify =
+    "http://localhost:3000/Authentication/ChangePassword/" + token.token;
   const urlMail = await sendMail(u.email, linkVerify);
   console.log({ urlMail });
   return u;
@@ -142,5 +143,24 @@ export const changePassword = async (changePassDto) => {
 
   token.active = false;
   await token.save();
+  return u;
+};
+
+// execute when user access /Authentication/ChangePassword/:token
+export const getUserWhenChangePassword = async (t) => {
+  const token = await getToken(t);
+  if (_.isError(token)) {
+    return token;
+  }
+
+  const u = await UserModel.findOne({ token }).select({
+    email: 1,
+    name: 2,
+    birthday: 3,
+    role: 4,
+  });
+  if (_.isNull(u)) {
+    return new Error("Your token is not correct");
+  }
   return u;
 };
