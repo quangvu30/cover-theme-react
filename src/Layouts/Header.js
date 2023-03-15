@@ -1,27 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Dropdown, DropdownMenu, DropdownToggle, Form } from "reactstrap";
 
 //import images
-import logoSm from "../assets/images/logo-sm.png";
-import logoDark from "../assets/images/logo-dark.png";
-import logoLight from "../assets/images/logo-light.png";
+import logoSm from "@/assets/images/logo-sm.png";
+import logoDark from "@/assets/images/logo-dark.png";
+import logoLight from "@/assets/images/logo-light.png";
 
 //import Components
-import SearchOption from "../Components/Common/SearchOption";
-import LanguageDropdown from "../Components/Common/LanguageDropdown";
-import WebAppsDropdown from "../Components/Common/WebAppsDropdown";
-import MyCartDropdown from "../Components/Common/MyCartDropdown";
-import FullScreenDropdown from "../Components/Common/FullScreenDropdown";
-import NotificationDropdown from "../Components/Common/NotificationDropdown";
-import ProfileDropdown from "../Components/Common/ProfileDropdown";
-import LightDark from "../Components/Common/LightDark";
+import SearchOption from "@/Components/Common/SearchOption";
+import LanguageDropdown from "@/Components/Common/LanguageDropdown";
+import WebAppsDropdown from "@/Components/Common/WebAppsDropdown";
+import MyCartDropdown from "@/Components/Common/MyCartDropdown";
+import FullScreenDropdown from "@/Components/Common/FullScreenDropdown";
+import NotificationDropdown from "@/Components/Common/NotificationDropdown";
+import ProfileDropdown from "@/Components/Common/ProfileDropdown";
+import LightDark from "@/Components/Common/LightDark";
 
 const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
   const [search, setSearch] = useState(false);
   const toogleSearch = () => {
     setSearch(!search);
   };
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-layout", "vertical");
+    document.documentElement.setAttribute("data-sidebar", "light");
+    document.documentElement.setAttribute("data-sidebar-image", "none");
+    document.documentElement.setAttribute("data-preloader", "disable");
+    document.documentElement.setAttribute("data-topbar", "light");
+    document.documentElement.setAttribute("data-layout-Model", "light");
+    document.documentElement.setAttribute("data-layout-width", "fluid");
+    document.documentElement.setAttribute("data-layout-position", "fixed");
+  });
 
   const toogleMenuBtn = () => {
     var windowSize = document.documentElement.clientWidth;
@@ -35,7 +46,6 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
         ? document.documentElement.setAttribute("data-sidebar-size", "")
         : document.documentElement.setAttribute("data-sidebar-size", "sm");
     } else if (windowSize > 1025) {
-      alert(windowSize);
       document.body.classList.remove("vertical-sidebar-enable");
       document.documentElement.getAttribute("data-sidebar-size") === "lg"
         ? document.documentElement.setAttribute("data-sidebar-size", "sm")

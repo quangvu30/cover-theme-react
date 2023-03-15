@@ -15,30 +15,13 @@ import {
   Form,
 } from "reactstrap";
 
-// Formik Validation
-import * as Yup from "yup";
-import { useFormik } from "formik";
-
-//redux
-import { useSelector, useDispatch } from "react-redux";
-
 import avatar from "../../assets/images/users/avatar-1.jpg";
-// actions
-import { editProfile, resetProfileFlag } from "../../store/actions";
 
 const UserProfile = () => {
-  const dispatch = useDispatch();
-
   const [email, setemail] = useState("admin@gmail.com");
   const [idx, setidx] = useState("1");
 
   const [userName, setUserName] = useState("Admin");
-
-  const { user, success, error } = useSelector(state => ({
-    user: state.Profile.user,
-    success: state.Profile.success,
-    error: state.Profile.error
-  }));
 
   useEffect(() => {
     if (sessionStorage.getItem("authUser")) {
@@ -58,35 +41,16 @@ const UserProfile = () => {
         dispatch(resetProfileFlag());
       }, 3000);
     }
-  }, [dispatch, user]);
+  }, []);
 
-
-
-  const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
-    enableReinitialize: true,
-
-    initialValues: {
-      first_name: userName || 'Admin',
-      idx: idx || '',
-    },
-    validationSchema: Yup.object({
-      first_name: Yup.string().required("Please Enter Your UserName"),
-    }),
-    onSubmit: (values) => {
-      dispatch(editProfile(values));
-    }
-  });
-
-  document.title = "Profile | Velzon - React Admin & Dashboard Template";
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
           <Row>
             <Col lg="12">
-              {error && error ? <Alert color="danger">{error}</Alert> : null}
-              {success ? <Alert color="success">Username Updated To {userName}</Alert> : null}
+              {/* {error && error ? <Alert color="danger">{error}</Alert> : null}
+              {success ? <Alert color="success">Username Updated To {userName}</Alert> : null} */}
 
               <Card>
                 <CardBody>
@@ -119,7 +83,6 @@ const UserProfile = () => {
                 className="form-horizontal"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  validation.handleSubmit();
                   return false;
                 }}
               >
@@ -131,16 +94,7 @@ const UserProfile = () => {
                     className="form-control"
                     placeholder="Enter User Name"
                     type="text"
-                    onChange={validation.handleChange}
-                    onBlur={validation.handleBlur}
-                    value={validation.values.first_name || ""}
-                    invalid={
-                      validation.touched.first_name && validation.errors.first_name ? true : false
-                    }
                   />
-                  {validation.touched.first_name && validation.errors.first_name ? (
-                    <FormFeedback type="invalid">{validation.errors.first_name}</FormFeedback>
-                  ) : null}
                   <Input name="idx" value={idx} type="hidden" />
                 </div>
                 <div className="text-center mt-4">

@@ -1,64 +1,60 @@
-import PropTypes from "prop-types";
-import React from "react";
-import { Row, Col, Alert, Card, CardBody, Container, FormFeedback, Input, Label, Form } from "reactstrap";
+import React, { useState } from "react";
+import {
+  Row,
+  Col,
+  Alert,
+  Card,
+  CardBody,
+  Container,
+  Input,
+  Label,
+  Form,
+  Spinner,
+} from "reactstrap";
 
-//redux
-import { useSelector, useDispatch } from "react-redux";
-
-import { Link } from "react-router-dom";
-
-// Formik Validation
-import * as Yup from "yup";
-import { useFormik } from "formik";
-
-// action
-import { userForgetPassword } from "../../store/actions";
+import Link from "next/link";
 
 // import images
-// import profile from "../../assets/images/bg.png";
 import logoLight from "../../assets/images/logo-light.png";
 import ParticlesAuth from "../AuthenticationInner/ParticlesAuth";
 
-import withRouter from "../../Components/Common/withRouter";
+import { patchChangePassword } from "@/helpers/backend_request";
 
-const ForgetPasswordPage = props => {
-  document.title="Reset Password | Velzon - React Admin & Dashboard Template";
+const ForgetPasswordPage = (props) => {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const dispatch = useDispatch();
-
-  const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
-    enableReinitialize: true,
-
-    initialValues: {
-      email: '',
-    },
-    validationSchema: Yup.object({
-      email: Yup.string().required("Please Enter Your Email"),
-    }),
-    onSubmit: (values) => {
-      dispatch(userForgetPassword(values, props.router.location.pathname));
+    setLoading(true);
+    try {
+      const response = await patchChangePassword({ email });
+      response.data?.success
+        ? setStatus(response.data.success)
+        : setError(response.data?.error);
+    } catch (error) {
+      setError(error.message);
     }
-  });
-
-  const { forgetError, forgetSuccessMsg } = useSelector(state => ({
-    forgetError: state.ForgetPassword.forgetError,
-    forgetSuccessMsg: state.ForgetPassword.forgetSuccessMsg,
-  }));
+    setLoading(false);
+  };
 
   return (
     <ParticlesAuth>
-      <div className="auth-page-content">        
+      <div className="auth-page-content">
         <Container>
           <Row>
             <Col lg={12}>
               <div className="text-center mt-sm-5 mb-4 text-white-50">
                 <div>
-                  <Link to="/" className="d-inline-block auth-logo">
+                  <Link href="/" className="d-inline-block auth-logo">
                     <img src={logoLight} alt="" height="20" />
                   </Link>
                 </div>
-                <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
+                <p className="mt-3 fs-15 fw-medium">
+                  Premium Admin & Dashboard Template
+                </p>
               </div>
             </Col>
           </Row>
@@ -66,7 +62,6 @@ const ForgetPasswordPage = props => {
           <Row className="justify-content-center">
             <Col md={8} lg={6} xl={5}>
               <Card className="mt-4">
-
                 <CardBody className="p-4">
                   <div className="text-center mt-2">
                     <h5 className="text-primary">Forgot Password?</h5>
@@ -78,32 +73,33 @@ const ForgetPasswordPage = props => {
                       colors="primary:#0ab39c"
                       className="avatar-xl"
                       style={{ width: "120px", height: "120px" }}
-                      >
-                    </lord-icon>
-
+                    ></lord-icon>
                   </div>
 
-                  <Alert className="alert-borderless alert-warning text-center mb-2 mx-2" role="alert">
-                    Enter your email and instructions will be sent to you!
-                  </Alert>
-                  <div className="p-2">
-                    {forgetError && forgetError ? (
-                      <Alert color="danger" style={{ marginTop: "13px" }}>
-                        {forgetError}
-                      </Alert>
-                    ) : null}
-                    {forgetSuccessMsg ? (
-                      <Alert color="success" style={{ marginTop: "13px" }}>
-                        {forgetSuccessMsg}
-                      </Alert>
-                    ) : null}
-                    <Form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        validation.handleSubmit();
-                        return false;
-                      }}
+                  {status ? (
+                    <Alert
+                      className="alert-borderless alert-warning text-center mb-2 mx-2"
+                      role="alert"
                     >
+                      Please check your email !
+                    </Alert>
+                  ) : error != null ? (
+                    <Alert
+                      className="alert-borderless alert-warning text-center mb-2 mx-2"
+                      role="alert"
+                    >
+                      {error}
+                    </Alert>
+                  ) : (
+                    <Alert
+                      className="alert-borderless alert-warning text-center mb-2 mx-2"
+                      role="alert"
+                    >
+                      Enter your email and instructions will be sent to you!
+                    </Alert>
+                  )}
+                  <div className="p-2">
+                    <Form onSubmit={handleSubmit}>
                       <div className="mb-4">
                         <Label className="form-label">Email</Label>
                         <Input
@@ -111,20 +107,15 @@ const ForgetPasswordPage = props => {
                           className="form-control"
                           placeholder="Enter email"
                           type="email"
-                          onChange={validation.handleChange}
-                          onBlur={validation.handleBlur}
-                          value={validation.values.email || ""}
-                          invalid={
-                            validation.touched.email && validation.errors.email ? true : false
-                          }
+                          value={email}
+                          onChange={({ target }) => setEmail(target.value)}
                         />
-                        {validation.touched.email && validation.errors.email ? (
-                          <FormFeedback type="invalid"><div>{validation.errors.email}</div></FormFeedback>
-                        ) : null}
                       </div>
 
                       <div className="text-center mt-4">
-                        <button className="btn btn-success w-100" type="submit">Send Reset Link</button>
+                        <button className="btn btn-success w-100" type="submit">
+                          {loading ? <Spinner /> : "Send Reset Link"}
+                        </button>
                       </div>
                     </Form>
                   </div>
@@ -132,9 +123,17 @@ const ForgetPasswordPage = props => {
               </Card>
 
               <div className="mt-4 text-center">
-                <p className="mb-0">Wait, I remember my password... <Link to="/login" className="fw-semibold text-primary text-decoration-underline"> Click here </Link> </p>
+                <p className="mb-0">
+                  Wait, I remember my password...{" "}
+                  <Link
+                    href="/Authentication/Login"
+                    className="fw-semibold text-primary text-decoration-underline"
+                  >
+                    {" "}
+                    Click here{" "}
+                  </Link>{" "}
+                </p>
               </div>
-
             </Col>
           </Row>
         </Container>
@@ -143,8 +142,4 @@ const ForgetPasswordPage = props => {
   );
 };
 
-ForgetPasswordPage.propTypes = {
-  history: PropTypes.object,
-};
-
-export default withRouter(ForgetPasswordPage);
+export default ForgetPasswordPage;
